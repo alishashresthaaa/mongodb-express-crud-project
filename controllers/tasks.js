@@ -33,14 +33,14 @@ const createTask = asyncWrapper(async (req, res) => {
 // const getTask = async (req, res) => {
 //   try {
 //     const task = await Task.findOne({ _id: req.params.id });
-//     // If id has correct syntax but not in the list, then custom error
+//     // If id has correct syntax but not in the list, then custom error - add return inside the   if        statement so that the js can execute it and terminate from there
 //     if (!task)
 //       return res
 //         .status(404)
 //         .json({ msg: `Task not found with id : ${req.params.id}` });
 //     res.status(200).json({ task });
 //   } catch (error) {
-//     // If syntax of id is incorrect then error from the promise
+     // If syntax of id is incorrect then error from the promise
 //     res.status(500).json({ msg: error });
 //   }
 // };
@@ -49,13 +49,14 @@ const getTask = asyncWrapper(async (req, res, next) => {
   const task = await Task.findOne({ _id: req.params.id });
   // If id has correct syntax but not in the list, then custom error
   if (!task)
+    // Passing the function to the next middleware
     return next(
       createCustomError(`Task not found with id : ${req.params.id}`, 404)
     );
   res.status(200).json({ task });
 });
 
-// PUT - replace the existing resource
+// PUT - replace the existing resource - add overwrite:true on the third option in findOneAndUpdate
 // PATCH - partially update
 
 // const updateTask = async (req, res) => {
@@ -74,15 +75,15 @@ const getTask = asyncWrapper(async (req, res, next) => {
 //   }
 // };
 
-const updateTask = asyncWrapper(async (req, res) => {
+const updateTask = asyncWrapper(async (req, res, next) => {
   const task = await Task.findOneAndUpdate({ _id: req.params.id }, req.body, {
     new: true,
     runValidators: true,
   });
   if (!task)
-  return next(
-    createCustomError(`Task not found with id : ${req.params.id}`, 404)
-  );
+    return next(
+      createCustomError(`Task not found with id : ${req.params.id}`, 404)
+    );
   res.status(200).json({ task });
 });
 
@@ -99,12 +100,12 @@ const updateTask = asyncWrapper(async (req, res) => {
 //   }
 // };
 
-const deleteTask = asyncWrapper(async (req, res) => {
+const deleteTask = asyncWrapper(async (req, res, next) => {
   const task = await Task.findOneAndDelete({ _id: req.params.id });
   if (!task)
-  return next(
-    createCustomError(`Task not found with id : ${req.params.id}`, 404)
-  );
+    return next(
+      createCustomError(`Task not found with id : ${req.params.id}`, 404)
+    );
   res.status(200).json({ task });
 });
 
